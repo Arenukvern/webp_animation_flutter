@@ -233,6 +233,7 @@ class _WebpAnimationLayerState extends State<WebpAnimationLayer>
             loop: widget.loop,
           );
         }
+        // ignore: avoid_catches_without_on_clauses
       } catch (error) {
         if (!mounted) return;
         setState(() {
@@ -251,8 +252,8 @@ class _WebpAnimationLayerState extends State<WebpAnimationLayer>
     });
 
     // Initialize game loop controller
-    final gameLoopController = GameLoopController(vsync: this);
-    gameLoopController.onTick = _onGameLoopTick;
+    final gameLoopController = GameLoopController(vsync: this)
+      ..onTick = _onGameLoopTick;
 
     // Create layer controller
     _layerController = WebpAnimationLayerController(

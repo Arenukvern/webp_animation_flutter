@@ -207,8 +207,8 @@ class _WebpAnimationState extends State<WebpAnimation>
 
     // Use provided controller or create our own game loop
     if (widget.controller == null) {
-      final gameLoopController = GameLoopController(vsync: this);
-      gameLoopController.onTick = _onGameLoopTick;
+      final gameLoopController = GameLoopController(vsync: this)
+        ..onTick = _onGameLoopTick;
 
       _webpController = WebpAnimationController(
         gameLoopController: gameLoopController,

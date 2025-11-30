@@ -110,7 +110,9 @@ class _HomePageState extends State<HomePage> {
           ),
           const SizedBox(height: 20),
           Text(
-            'Single WebpAnimationLayer widget\nOne draw call for all animations\nPerfect synchronization',
+            'Single WebpAnimationLayer widget\n'
+            'One draw call for all animations\n'
+            'Perfect synchronization',
             style: Theme.of(context).textTheme.bodyMedium,
             textAlign: TextAlign.center,
           ),

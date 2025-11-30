@@ -113,7 +113,8 @@ void main() {
       );
 
       // For single-frame animations, completion depends on timing
-      // This is expected behavior - single frame animations are immediately "complete"
+      // This is expected behavior - single frame animations are
+      // immediately "complete"
       // in terms of having displayed all their content
 
       // Should start at frame 0
@@ -131,7 +132,8 @@ void main() {
         reason: 'Animation should be playing after play()',
       );
 
-      // For single-frame animation with 100ms delay, after 100ms it should be completed
+      // For single-frame animation with 100ms delay,
+      // after 100ms it should be completed
       animationState.update(
         0.1,
       ); // 100ms - should complete single frame animation
@@ -139,14 +141,15 @@ void main() {
         animationState.isCompleted,
         isTrue,
         reason:
-            'Single-frame animation should be completed after its delay duration',
+            'Single-frame animation should be completed '
+            'after its delay duration',
       );
     });
 
     test('Frame timing calculation works correctly', () {
       // Test the FrameTiming.getFrameIndex function directly
       final spriteSheet = SpriteSheet(
-        pixels: Uint8List(2400 * 400 * 4), // 6 frames * 400x400
+        pixels: Uint8List(2400 * 400 * 4), // 6 frames * 400x400 pixels
         width: 2400, // 6 * 400
         height: 400,
         frameWidth: 400,

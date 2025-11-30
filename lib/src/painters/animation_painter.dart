@@ -11,7 +11,8 @@ import '../models/webp_animation_item.dart';
 /// Unified painter for rendering WebP animations with optimal GPU performance.
 ///
 /// Supports both single animations and batched multi-animation rendering.
-/// Uses efficient GPU operations to minimize draw calls and maximize frame rates.
+/// Uses efficient GPU operations to minimize draw calls
+/// and maximize frame rates.
 /// {@endtemplate}
 class AnimationPainter extends CustomPainter {
   /// {@macro animation_painter}

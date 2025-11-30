@@ -38,7 +38,8 @@ class WebpAnimationController {
   /// Disposes of the controller and cleans up resources.
   ///
   /// @ai Always call this when the controller is no longer needed.
-  /// Note: This does not dispose the GameLoopController as it's owned by the widget.
+  /// Note: This does not dispose the GameLoopController
+  /// as it's owned by the widget.
   void dispose() {
     gameLoopController?.dispose();
   }

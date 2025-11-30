@@ -1,4 +1,5 @@
-/// High-performance WebP animation library for Flutter using game dev principles.
+/// High-performance WebP animation library for Flutter using
+/// game dev principles.
 ///
 /// This library provides efficient WebP animation rendering with isolate-based
 /// decoding and sprite sheet batching for smooth performance.

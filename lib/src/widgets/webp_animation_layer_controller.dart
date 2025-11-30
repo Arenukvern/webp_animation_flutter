@@ -2,7 +2,8 @@ import '../core/animation_state.dart';
 import '../core/game_loop_controller.dart';
 
 /// {@template webp_animation_layer_controller}
-/// Controller for managing multiple animations in a layer using game loop timing.
+/// Controller for managing multiple animations in a layer
+/// using game loop timing.
 ///
 /// Provides unified control over all animations in a WebpAnimationLayer,
 /// maintaining the same API while using the new game loop system internally.

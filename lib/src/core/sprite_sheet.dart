@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 import 'animation_frame.dart';
 
 /// {@template sprite_sheet}
-/// Represents a decoded WebP animation as a sprite sheet ready for GPU rendering.
+/// Represents a decoded WebP animation as a sprite sheet
+/// ready for GPU rendering.
 ///
 /// Contains the raw pixel data, dimensions, and frame metadata for efficient
-/// animation playback. All frames are packed horizontally into a single texture.
+/// animation playback. All frames are packed horizontally
+/// into a single texture.
 /// {@endtemplate}
 @immutable
 class SpriteSheet {
@@ -143,7 +145,8 @@ class SpriteSheet {
     return frames.isNotEmpty ? frames.first.index : 0;
   }
 
-  /// Calculates the source rectangle for a given frame index in the sprite sheet.
+  /// Calculates the source rectangle for a given frame
+  /// index in the sprite sheet.
   Rect getFrameRect(final int frameIndex) {
     final clampedIndex = frameIndex.clamp(0, frameCount - 1);
     final x = clampedIndex * frameWidth.toDouble();
