@@ -1,0 +1,25 @@
+name: webp_animation_example
+description: Example app demonstrating WebP animation performance with single vs batch rendering.
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ">=3.10.0 <4.0.0"
+  flutter: ">=3.38.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  webp_animation_flutter:
+    path: ../
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  lints: ^6.0.0
+  xsoulspace_lints: ^0.1.2
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/animated-webp-supported.webp
