@@ -1,8 +1,13 @@
 # Changelog
 
+## [0.1.0-dev.2] - 2025-11-30
+
+- added demo video to README
+
 ## [0.1.0-dev.1] - 2025-11-30
 
 ### Added
+
 - Initial implementation of WebP animation library
 - Isolate-based WebP decoding for smooth UI performance
 - Sprite sheet rendering for efficient GPU usage

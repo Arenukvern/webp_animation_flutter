@@ -8,6 +8,12 @@ Please notice: this package status is a `proof of concept`. Feel free to clone, 
 
 The animated WebP demo asset from Mathias Bynens for example purposes only: [https://mathiasbynens.be/demo/animated-webp](https://mathiasbynens.be/demo/animated-webp)
 
+## Demo
+
+Check out a quick video demo:
+
+[![WebP Animation Flutter Demo](https://img.youtube.com/vi/-6i0OvZ2IJk/hqdefault.jpg)](https://youtube.com/shorts/-6i0OvZ2IJk?si=P795dIv3OfScBolE)
+
 ---
 
 ## FAQ
