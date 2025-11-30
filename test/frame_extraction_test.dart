@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print, lines_longer_than_80_chars, avoid_multiple_declarations_per_line
+
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -19,7 +21,7 @@ void main() {
   group('WebP Frame Extraction Tests', () {
     late Directory testOutputDir;
 
-    setUp(() async {
+    setUp(() {
       // Initialize Flutter binding for asset loading
       TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -315,7 +317,6 @@ void main() {
 
 /// Creates a visual grid showing all frames arranged in a spreadsheet layout.
 Future<img.Image> _createFrameGrid(final SpriteSheet spriteSheet) async {
-  const maxFramesPerRow = 10;
   const margin = 2;
 
   // Calculate grid dimensions for spreadsheet-like layout

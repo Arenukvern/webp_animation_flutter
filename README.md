@@ -4,6 +4,10 @@ High-performance Flutter library for animated WebP, using a game loop architectu
 
 Please notice: this package status is a `proof of concept`. Feel free to clone, contribute, and improve it if you will have use for it:)
 
+## Credits
+
+The animated WebP demo asset from Mathias Bynens for example purposes only: [https://mathiasbynens.be/demo/animated-webp](https://mathiasbynens.be/demo/animated-webp)
+
 ---
 
 ## FAQ
@@ -203,7 +207,3 @@ Remove the `controllers:` parameter from `WebpAnimationLayer`—timing is now un
 MIT License. See LICENSE for details.
 
 ---
-
-## Credits
-
-Animated WebP demo assets: [https://mathiasbynens.be/demo/animated-webp](https://mathiasbynens.be/demo/animated-webp)

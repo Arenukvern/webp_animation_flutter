@@ -79,49 +79,7 @@ class AnimationPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant final AnimationPainter oldDelegate) {
-    return true;
-    // Check basic properties
-    if (spriteSheets.length != oldDelegate.spriteSheets.length ||
-        images.length != oldDelegate.images.length ||
-        animationStates.length != oldDelegate.animationStates.length ||
-        fit != oldDelegate.fit ||
-        alignment != oldDelegate.alignment ||
-        filterQuality != oldDelegate.filterQuality) {
-      return true;
-    }
-
-    // Check if any sprite sheets changed
-    for (int i = 0; i < spriteSheets.length; i++) {
-      if (spriteSheets[i] != oldDelegate.spriteSheets[i]) return true;
-    }
-
-    // Check if any images changed
-    for (int i = 0; i < images.length; i++) {
-      if (images[i] != oldDelegate.images[i]) return true;
-    }
-
-    // Check if any animation states changed significantly
-    for (int i = 0; i < animationStates.length; i++) {
-      final oldState = oldDelegate.animationStates[i];
-      final newState = animationStates[i];
-      if (oldState?.currentFrameIndex != newState?.currentFrameIndex) {
-        return true;
-      }
-    }
-
-    // Check animation items
-    if (animationItems?.length != oldDelegate.animationItems?.length) {
-      return true;
-    }
-    if (animationItems != null && oldDelegate.animationItems != null) {
-      for (int i = 0; i < animationItems!.length; i++) {
-        if (animationItems![i] != oldDelegate.animationItems![i]) return true;
-      }
-    }
-
-    return false;
-  }
+  bool shouldRepaint(covariant final AnimationPainter oldDelegate) => true;
 
   @override
   String toString() =>
