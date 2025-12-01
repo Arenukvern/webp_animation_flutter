@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.1.0-dev.3] - 2025-12-01
+
+- fixed links to documentation in README.md
+
 ## [0.1.0-dev.2] - 2025-11-30
 
 - added demo video to README
