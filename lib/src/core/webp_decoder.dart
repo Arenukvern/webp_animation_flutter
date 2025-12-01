@@ -197,8 +197,12 @@ class WebpDecoder {
   /// Results are cached to avoid re-decoding the same animation.
   ///
   /// @ai Use this method to load WebP animations efficiently.
-  static Future<SpriteSheet> decodeFromAsset(final String assetPath) => _cache
-      .putIfAbsent(AssetSource(assetPath), () => _decodeFromAsset(assetPath));
+  static Future<SpriteSheet> decodeFromAsset(final String assetPath) =>
+      _cache.putIfAbsent(
+        AssetSource(assetPath),
+        'animation',
+        () => _decodeFromAsset(assetPath),
+      );
 
   /// Decodes a WebP animation from a network URL to a sprite sheet.
   ///
@@ -206,8 +210,8 @@ class WebpDecoder {
   /// Results are cached to avoid re-decoding the same animation.
   ///
   /// @ai Use this method to load WebP animations from the network efficiently.
-  static Future<SpriteSheet> decodeFromUrl(final String url) =>
-      _cache.putIfAbsent(NetworkSource(url), () => _decodeFromUrl(url));
+  static Future<SpriteSheet> decodeFromUrl(final String url) => _cache
+      .putIfAbsent(NetworkSource(url), 'animation', () => _decodeFromUrl(url));
 
   /// Decodes a static WebP image from any source type.
   ///
@@ -233,6 +237,7 @@ class WebpDecoder {
     final String assetPath,
   ) => _cache.putIfAbsent(
     AssetSource(assetPath),
+    'static',
     () => _decodeStaticFromAsset(assetPath),
   );
 
@@ -244,7 +249,11 @@ class WebpDecoder {
   /// @ai Use this method to load static WebP images from the
   /// network efficiently.
   static Future<StaticImageSheet> decodeStaticFromUrl(final String url) =>
-      _cache.putIfAbsent(NetworkSource(url), () => _decodeStaticFromUrl(url));
+      _cache.putIfAbsent(
+        NetworkSource(url),
+        'static',
+        () => _decodeStaticFromUrl(url),
+      );
 
   /// Internal method to decode a WebP animation from an asset.
   static Future<SpriteSheet> _decodeFromAsset(final String assetPath) async {

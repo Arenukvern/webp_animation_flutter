@@ -32,12 +32,14 @@ class WebpCache {
     _accessOrder.clear();
   }
 
-  /// Retrieves or creates a cached value.
+  /// Retrieves or creates a cached value with type-specific key.
   Future<T> putIfAbsent<T>(
     final WebpSource source,
+    final String typeIdentifier,
     final Future<T> Function() ifAbsent,
   ) {
-    final key = _createKey(source);
+    // Create type-specific key to prevent animation/static image conflicts
+    final key = _createKey(source, typeIdentifier);
 
     // Move to end of access order (most recently used)
     _accessOrder
@@ -49,14 +51,15 @@ class WebpCache {
     // Ensure cache size after adding new item
     _ensureCacheSize();
 
-    return result;
+    return result as Future<T>;
   }
 
-  /// Generates a cache key from a WebpSource.
-  String _createKey(final WebpSource source) => switch (source) {
-    AssetSource(path: final path) => 'asset:$path',
-    NetworkSource(url: final url) => 'network:$url',
-  };
+  /// Generates a cache key from a WebpSource and type identifier.
+  String _createKey(final WebpSource source, final String type) =>
+      switch (source) {
+        AssetSource(path: final path) => '$type:asset:$path',
+        NetworkSource(url: final url) => '$type:network:$url',
+      };
 
   /// Ensures cache stays within size limits using LRU eviction.
   void _ensureCacheSize() {
