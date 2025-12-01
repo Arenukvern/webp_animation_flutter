@@ -1,0 +1,89 @@
+---
+alwaysApply: false
+description: Guidelines to create a scalable test support and harness system from scratch for Dart/Flutter projects
+---
+
+## Goal
+
+Establish a lightweight, composable, and expressive test support system that standardizes setup, reduces boilerplate, and accelerates test authoring.
+
+## Principles
+
+- Keep tests intent-first; wire once, reuse everywhere.
+- Prefer fakes and counters over heavy mocks; only mock when necessary.
+- Centralize construction in a Harness; centralize data creation in Builders; centralize assertions in Matchers.
+- Enable table-driven tests via maps and iteration.
+
+## Minimal Structure
+
+- `test/support/`
+  - `harness.dart` — orchestrates shared fakes/resources and exposes factories for system-under-test (SUT) construction.
+  - `builders.dart` — compact builders for domain models and DTOs.
+  - `matchers.dart` — custom `Matcher`s for high-signal assertions.
+  - `fakes/` — small, fast fakes for infra (e.g., storage, provider), with counters and parameter capture when useful.
+
+## Harness Responsibilities
+
+- Hold shared test dependencies:
+  - Fakes (e.g., `FakeProvider`, `FakeLocalDb`)
+  - Local APIs (e.g., `PurchasesLocalApi`)
+  - Resources/state objects used by the SUT
+- Provide factories for commands/services under test with shared dependencies injected.
+- Provide "Given" helpers to configure fakes for common scenarios (success/failure with parameters).
+- Provide lifecycle helpers: `setUp()` to init, `tearDown()` to dispose.
+
+## Builders Guidelines
+
+- Provide small functions that return fully-formed domain objects with sensible defaults.
+- Keep parameters named and optional; allow overrides for targeted fields.
+- Avoid non-const default expressions; use nullable params with fallback inside implementation.
+
+## Matchers Guidelines
+
+- Create clear, reusable matchers for resource states and error conditions.
+- Prefer predicate-based matchers that read like English.
+- Keep messages specific to improve failure diagnostics.
+
+## Example APIs (abstract)
+
+```dart
+// harness.dart
+class TestEnv {
+  void setUp();
+  Future<void> tearDown();
+
+  // Given helpers
+  void givenSuccess();
+  void givenFailure([String error = 'err']);
+
+  // Factories
+  Service makeService();
+}
+
+// builders.dart
+Model aModel({String id = 'id', DateTime? at});
+
+// matchers.dart
+Matcher isReady();
+Matcher hasError([String? contains]);
+```
+
+## Process to Create
+
+1. Identify shared dependencies and resources used across tests.
+2. Implement a minimal `TestEnv` that owns them and exposes factories for SUT construction.
+3. Extract repeated object construction into `builders.dart`.
+4. Extract repeated assertions into `matchers.dart`.
+5. Convert one representative test file to validate ergonomics; iterate until concise and readable.
+6. Migrate other tests incrementally; keep behavior identical.
+
+## Data-Driven Tests
+
+- Define `Map<String, ({input: ..., expected: ...})>` and iterate with `cases.forEach((name, c) { ... })`.
+- Keep arrange/act/assert within each iteration minimal by using harness/builders/matchers.
+
+## Quality Bar
+
+- Tests should show intent in ≤10 lines per case.
+- No deep constructor chains in tests; only calls to harness factories and builders.
+- Assertions are readable, single-purpose, and use custom matchers.

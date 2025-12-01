@@ -1,0 +1,59 @@
+---
+alwaysApply: false
+description: Practices for maintaining and evolving an existing test support and harness system
+---
+
+## Goal
+
+Ensure the test harness remains reliable, ergonomic, and consistent as the codebase evolves.
+
+## Change Management
+
+- Update the harness once; keep tests thin. Any constructor/signature changes should be reflected in harness factories, not per-test.
+- Avoid leaking implementation details into tests; expose higher-level helpers when repetitive patterns emerge.
+- Keep fakes deterministic and fast. Add counters/params capture as needed.
+
+## Structure Hygiene
+
+- `harness.dart` stays the single source of truth for wiring.
+- `builders.dart` contains only data creation helpers; do not reach into external state.
+- `matchers.dart` contains only predicate-based matchers; avoid side effects.
+- Keep fakes in `test/support/fakes/` small and single-purpose. Prefer composition over inheritance.
+
+## API Evolution Rules
+
+- Adding new dependencies: extend the harness and its factories; do not edit tests directly.
+- Adding new scenarios: add `givenXxx()` helpers (e.g., `givenRestoreFailure`) and reuse in tests.
+- Breaking changes in SUT contracts: revise factories and adjust builders; matchers should rarely change.
+- Deprecations: migrate tests to new helpers, then remove obsolete helpers in a follow-up pass.
+
+## Data-Driven Testing
+
+- Encourage table-driven cases using maps and iteration; keep per-case logic minimal.
+- Extract common case sets into constants near the test or under `support/fixtures.dart` when reused.
+
+## Review Checklist
+
+- Are tests using harness factories instead of manual wiring?
+- Are new repeated patterns captured as helpers/builders/matchers?
+- Do custom matchers clearly explain expected state on failure?
+- Are fakes consistent and free of hidden global state?
+- Do all tests pass with lints clean after refactors?
+
+## Performance & Stability
+
+- Prefer synchronous fakes where possible; if async is needed, keep it predictable.
+- For streams, provide explicit `emit()` helpers in fakes to drive updates deterministically.
+- Avoid reliance on timers; prefer controlled triggers via harness methods.
+
+## Example Maintenance Tasks
+
+- Add a `givenCompleteFailure([error])` helper rather than duplicating provider setup across tests.
+- Introduce a matcher like `isPendingStatus()` if a status check recurs across files.
+- Consolidate repeated product creation into `aProduct(...)` builder with sensible defaults.
+
+## Quality Bar
+
+- New or modified tests should not add manual deep constructor chains.
+- Harness APIs must remain small and intention-revealing.
+- Keep files concise; prefer many small helpers over few monolithic ones.

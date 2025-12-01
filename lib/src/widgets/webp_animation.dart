@@ -7,6 +7,7 @@ import '../core/animation_state.dart';
 import '../core/game_loop_controller.dart';
 import '../core/sprite_sheet.dart';
 import '../core/webp_decoder.dart';
+import '../models/webp_source.dart';
 import '../painters/animation_painter.dart';
 import 'webp_animation_controller.dart';
 
@@ -21,7 +22,7 @@ import 'webp_animation_controller.dart';
 class WebpAnimation extends StatefulWidget {
   /// {@macro webp_animation}
   const WebpAnimation({
-    required this.asset,
+    required this.source,
     required this.width,
     required this.height,
     super.key,
@@ -40,8 +41,8 @@ class WebpAnimation extends StatefulWidget {
        assert(speed > 0, 'speed must be positive'),
        assert(fps > 0, 'fps must be positive');
 
-  /// Asset path to the WebP animation file.
-  final String asset;
+  /// Source of the WebP animation file.
+  final WebpSource source;
 
   /// Width of the animation display area.
   final double width;
@@ -125,8 +126,8 @@ class _WebpAnimationState extends State<WebpAnimation>
   void didUpdateWidget(final WebpAnimation oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // Reload if asset changed
-    if (oldWidget.asset != widget.asset) {
+    // Reload if source changed
+    if (oldWidget.source != widget.source) {
       unawaited(_loadAnimation());
     }
 
@@ -218,7 +219,7 @@ class _WebpAnimationState extends State<WebpAnimation>
   }
 
   Future<void> _loadAnimation() async {
-    _spriteSheetFuture = WebpDecoder.decodeFromAsset(widget.asset);
+    _spriteSheetFuture = WebpDecoder.decodeAnimation(widget.source);
     try {
       final spriteSheet = await _spriteSheetFuture;
       if (!mounted) return;

@@ -21,7 +21,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: WebpAnimation(
-            asset: animationAsset,
+            source: AssetSource(animationAsset),
             width: 200,
             height: 200,
             autoPlay: false, // Don't auto-play for controlled testing

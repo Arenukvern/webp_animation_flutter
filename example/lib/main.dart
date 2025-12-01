@@ -56,6 +56,7 @@ class _HomePageState extends State<HomePage> {
           _buildSingleAnimationView(),
           // Batch animation view
           _buildBatchAnimationView(),
+          _buildStaticImageView(),
         ],
       ),
     ),
@@ -67,10 +68,12 @@ class _HomePageState extends State<HomePage> {
           icon: Icon(Icons.looks_one),
           label: 'Single Animation',
         ),
+
         BottomNavigationBarItem(
           icon: Icon(Icons.grid_view),
           label: 'Batch ($animationCount Animations)',
         ),
+        BottomNavigationBarItem(icon: Icon(Icons.image), label: 'Static Image'),
       ],
     ),
   );
@@ -113,12 +116,12 @@ class _HomePageState extends State<HomePage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'Single Animation',
+          'Single Animation (AssetSource)',
           style: Theme.of(context).textTheme.headlineSmall,
         ),
         const SizedBox(height: 20),
         WebpAnimation(
-          asset: animationAsset,
+          source: const AssetSource(animationAsset),
           width: singleAnimationSize.width,
           height: singleAnimationSize.height,
         ),
@@ -127,6 +130,36 @@ class _HomePageState extends State<HomePage> {
           'Individual WebpAnimation widget\nSeparate draw call per animation',
           style: Theme.of(context).textTheme.bodyMedium,
           textAlign: TextAlign.center,
+        ),
+        Text(
+          'Single Animation (NetworkSource)',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
+        const SizedBox(height: 20),
+        WebpAnimation(
+          source: const NetworkSource(
+            'https://mathiasbynens.be/demo/animated-webp-supported.webp',
+          ),
+          width: singleAnimationSize.width,
+          height: singleAnimationSize.height,
+        ),
+      ],
+    ),
+  );
+
+  Widget _buildStaticImageView() => Center(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          'Static Image (AssetSource)',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
+        const SizedBox(height: 20),
+        WebpStaticImage(
+          source: const AssetSource(animationAsset),
+          width: singleAnimationSize.width,
+          height: singleAnimationSize.height,
         ),
       ],
     ),

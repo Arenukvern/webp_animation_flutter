@@ -1,0 +1,11 @@
+---
+globs: *.dart
+alwaysApply: false
+---
+
+**Writing Code Protocol**
+
+- Place mock, test and implementation exactly near intent file.
+- Export files from its folders using barrel file (ui/ui.dart, commands/commands.dart etc.).
+- Do not rely on strings, use enums.
+- Use context.read/context.select to subscribe to observable state in build methods.

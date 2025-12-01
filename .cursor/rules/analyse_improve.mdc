@@ -1,0 +1,8 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+
+Analyze {package} tests. Identify duplication and complexity, then propose a test harness with builders and matchers. Include example rewrites for one test as a code example.
+Find out what can be improved in organization so we could write tests more efficient, share resources and do not overcomplicate things

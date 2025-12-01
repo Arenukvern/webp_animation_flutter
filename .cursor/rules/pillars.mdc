@@ -1,0 +1,75 @@
+---
+alwaysApply: true
+---
+
+# Core Architectural Pillars
+
+Quick reference for architectural rules and constraints. Optimized for AI agent understanding.
+
+## Core Architecture & Objectives
+
+**Q: What is the primary performance objective of this ECS?**  
+A: Achieve near-native performance (C++/Rust) in Dart by eliminating Garbage Collection (GC) in the hot loop and maximizing CPU cache locality.
+
+## Data Layout & Storage
+
+**Q: What data layout pattern must be used for components?**  
+A: Strictly Structure of Arrays (SoA) using `dart:typed_data`. Never store Component objects on the Heap. Components stored as `Float32List`, `Int32List`, `Uint8List`, etc., not heap objects.
+
+**Q: What storage types should Archetype use for component data?**  
+A: Archetype stores `Column` objects (not `List<TypedData>` directly). Columns internally use `TypedData` (`FloatColumn` → `Float32List`, `IntColumn` → `Int32List`, `Uint8Column` → `Uint8List`). Position Component → `FloatColumn` (stores `Float32List`). Health Component → `IntColumn` (stores `Int32List`).
+
+**Q: How should fixed-size structs (Rect, Color, Matrix) be stored?**  
+A: Flatten via stride packing. Do not store a Box object. Store 4 floats (x, y, w, h) inside the Archetype's column. Map one "Logical Component" to multiple "Physical Columns" (or one larger stride). Example: `BoxCollider` with stride 4 stores x, y, w, h in `Float32List` with `_data[index * 4 + 0]` through `_data[index * 4 + 3]`.
+
+**Q: How should enums and finite states be stored?**  
+A: Integer mapping. Enums are just integers with names. Do not store the Enum object. Store `Uint8List` or `Uint16List` (store `enum.index`).
+
+**Q: How should strings and variable-length data be stored?**  
+A: Interning / ID Lookup. Variable-length strings kill performance because they cannot be packed into a fixed array. Solution: Store an int ID in the component, and keep the actual Strings in a central "Pool".
+
+**Q: When can I use ObjectColumn for heavy objects (Lists, Maps)?**  
+A: Only for "Cold" data (Inventory, AI Pathing) that isn't processed 60 times a second for 1,000,000 entities. Trade-off: Iterating ObjectColumn triggers Cache Misses and GC. Use `ObjectColumn<T>` as fallback "Generic Column" when data cannot be flattened. Example: `ObjectColumn<List<Item>>` for Inventory, `ObjectColumn<PathfindingData>` for pathfinding waypoints.
+
+**Q: What is the storage strategy decision matrix?**  
+A:
+
+- Primitive (Health: 100) → Direct → `Int32List` / `Float64List`
+- Vector/Struct (Rect: {x,y,w,h}) → Flattened → `Float32List` (Stride 4)
+- Enum/Flag (Team: Red) → Integer Cast → `Uint8List` (store enum.index)
+- String/Asset (Name: "Orc") → Interned Handle → `Int32List` (store ID to lookup)
+- Complex (Inventory: [Sword]) → Managed Object → `List<InventoryObj>` (Generic Column)
+
+## Entity Management
+
+**Q: What format must Entity IDs use?**  
+A: 64-bit Integer containing Index (32-bit) and Generation (32-bit). Implemented via extension type.
+
+## Iteration & Queries
+
+**Q: How should iteration work in systems?**  
+A: Cached Integer Lists (Queries) matching Bitmasks. No Map lookups in the update loop.
+
+## Vectorization & SIMD
+
+**Q: How should SIMD be used for math-heavy components?**  
+A: Explicit SIMD (`Float32x4`) usage in Systems. Systems should ask the Archetype's column for `Float32x4List` (views via `FloatColumn.simdView`), not individual doubles, whenever possible.
+
+## Safety Patterns
+
+**Q: How should structural changes (spawning/despawning) be handled?**  
+A: CommandQueue pattern to defer structural changes until the end of a frame. Use sealed classes.
+
+## Key Design Decisions
+
+**Q: Why Archetype Graph over Sparse Sets?**  
+A: Optimizes for iteration speed (Systems) over mutation (structural changes) speed (adding/removing components). Moving an entity copies its data to a new Archetype. This is the hot path optimization trade-off.
+
+**Q: Why is Row Mapping critical?**  
+A: The `Entities` class must maintain location tracking: `EntityID -> [ArchetypeId, Row Index]` stored in parallel `Uint32List` arrays (`_archetypeIds`, `_archetypeRows`). This is critical for O(1) component access outside of queries.
+
+**Q: Why swap-and-pop when removing entities?**  
+A: When removing an entity from an Archetype (during a move or delete), do not leave a hole. Move the last entity in that Archetype into the empty slot and update its Row Index mapping in both the Archetype's `_entityToRowIndex` map and the `Entities` location tracking. Maintains dense arrays, prevents fragmentation.
+
+**Q: Why must columns use TypedData abstraction?**  
+A: Unified interface (`FloatColumn`, `IntColumn`, `ObjectColumn`) enables different data types while preserving performance. `FloatColumn` enables SIMD, `ObjectColumn` handles complex types. Trade-off: `ObjectColumn` triggers GC but only for cold data.

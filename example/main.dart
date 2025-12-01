@@ -131,7 +131,7 @@ class _HomePageState extends State<HomePage> {
         ),
         const SizedBox(height: 20),
         WebpAnimation(
-          asset: animationAsset,
+          source: const AssetSource(animationAsset),
           width: singleAnimationSize.width,
           height: singleAnimationSize.height,
         ),
