@@ -19,9 +19,9 @@ void main() {
       const animationAsset = 'example/assets/animated-webp-supported.webp';
 
       await tester.pumpWidget(
-        const MaterialApp(
+        MaterialApp(
           home: WebpAnimation(
-            source: AssetSource(animationAsset),
+            uri: Uri(path: animationAsset),
             width: 200,
             height: 200,
             autoPlay: false, // Don't auto-play for controlled testing
@@ -55,15 +55,15 @@ void main() {
       // Arrange: Create multiple animation items
       const animationAsset = 'example/assets/animated-webp-supported.webp';
       final animationItems = [
-        const WebpAnimationItem(
-          asset: animationAsset,
+        WebpAnimationItem(
+          uri: Uri(path: animationAsset),
           position: Offset.zero,
-          size: Size(100, 100),
+          size: const Size(100, 100),
         ),
-        const WebpAnimationItem(
-          asset: animationAsset,
-          position: Offset(100, 0),
-          size: Size(100, 100),
+        WebpAnimationItem(
+          uri: Uri(path: animationAsset),
+          position: const Offset(100, 0),
+          size: const Size(100, 100),
         ),
       ];
 

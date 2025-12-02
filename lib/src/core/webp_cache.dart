@@ -65,8 +65,8 @@ class WebpCache {
   void _ensureCacheSize() {
     while (_cache.length > maxCacheSize && _accessOrder.isNotEmpty) {
       final oldestKey = _accessOrder.removeAt(0);
-      // ignore: unused_local_variable
-      final unused = _cache.remove(oldestKey);
+      // Remove entry from cache (returned Future is intentionally ignored)
+      final _ = _cache.remove(oldestKey);
     }
   }
 }

@@ -22,7 +22,7 @@ import 'webp_animation_controller.dart';
 class WebpAnimation extends StatefulWidget {
   /// {@macro webp_animation}
   const WebpAnimation({
-    required this.source,
+    required this.uri,
     required this.width,
     required this.height,
     super.key,
@@ -41,8 +41,11 @@ class WebpAnimation extends StatefulWidget {
        assert(speed > 0, 'speed must be positive'),
        assert(fps > 0, 'fps must be positive');
 
-  /// Source of the WebP animation file.
-  final WebpSource source;
+  /// URI of the WebP animation file.
+  ///
+  /// - Use `Uri.parse('https://...')` for network sources
+  /// - Use `Uri(path: 'assets/...')` or `Uri.parse('asset://assets/...')` for assets
+  final Uri uri;
 
   /// Width of the animation display area.
   final double width;
@@ -126,8 +129,8 @@ class _WebpAnimationState extends State<WebpAnimation>
   void didUpdateWidget(final WebpAnimation oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // Reload if source changed
-    if (oldWidget.source != widget.source) {
+    // Reload if uri changed
+    if (oldWidget.uri != widget.uri) {
       unawaited(_loadAnimation());
     }
 
@@ -219,7 +222,8 @@ class _WebpAnimationState extends State<WebpAnimation>
   }
 
   Future<void> _loadAnimation() async {
-    _spriteSheetFuture = WebpDecoder.decodeAnimation(widget.source);
+    final source = WebpSource.fromUri(widget.uri);
+    _spriteSheetFuture = WebpDecoder.decodeAnimation(source);
     try {
       final spriteSheet = await _spriteSheetFuture;
       if (!mounted) return;

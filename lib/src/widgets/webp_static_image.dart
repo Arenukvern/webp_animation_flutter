@@ -16,7 +16,7 @@ import '../painters/animation_painter.dart';
 class WebpStaticImage extends StatefulWidget {
   /// {@macro webp_static_image}
   const WebpStaticImage({
-    required this.source,
+    required this.uri,
     required this.width,
     required this.height,
     super.key,
@@ -27,8 +27,11 @@ class WebpStaticImage extends StatefulWidget {
   }) : assert(width > 0, 'width must be positive'),
        assert(height > 0, 'height must be positive');
 
-  /// Source of the WebP image file.
-  final WebpSource source;
+  /// URI of the WebP image file.
+  ///
+  /// - Use `Uri.parse('https://...')` for network sources
+  /// - Use `Uri(path: 'assets/...')` or `Uri.parse('asset://assets/...')` for assets
+  final Uri uri;
 
   /// Width of the image display area.
   final double width;
@@ -85,8 +88,8 @@ class _WebpStaticImageState extends State<WebpStaticImage> {
   void didUpdateWidget(final WebpStaticImage oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    // Reload if source changed
-    if (oldWidget.source != widget.source) {
+    // Reload if uri changed
+    if (oldWidget.uri != widget.uri) {
       unawaited(_loadImage());
     }
   }
@@ -146,7 +149,8 @@ class _WebpStaticImageState extends State<WebpStaticImage> {
   }
 
   Future<void> _loadImage() async {
-    _imageSheetFuture = WebpDecoder.decodeStatic(widget.source);
+    final source = WebpSource.fromUri(widget.uri);
+    _imageSheetFuture = WebpDecoder.decodeStatic(source);
     try {
       final imageSheet = await _imageSheetFuture!;
       if (!mounted) return;
@@ -158,8 +162,8 @@ class _WebpStaticImageState extends State<WebpStaticImage> {
 
       try {
         final image = await WebpDecoder.createImageFromSpriteSheet(
-          // Convert StaticImageSheet to SpriteSheet-like structure for GPU upload
-          // This is a temporary hack - we'll improve this in the next phase
+          // Convert StaticImageSheet to SpriteSheet structure for GPU upload
+          // Reuses the same GPU texture upload path as animated sprites
           SpriteSheet(
             pixels: imageSheet.pixels,
             width: imageSheet.width,
