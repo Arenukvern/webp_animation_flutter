@@ -3,22 +3,23 @@ import 'package:flutter/material.dart';
 /// {@template webp_animation_item}
 /// Represents a single WebP animation to be rendered in a [WebpAnimationLayer].
 ///
-/// Defines the asset path, screen position, and render size for one animation
+/// Defines the URI, screen position, and render size for one animation
 /// within a batch of multiple animations.
 /// {@endtemplate}
 @immutable
 class WebpAnimationItem {
   /// {@macro webp_animation_item}
   const WebpAnimationItem({
-    required this.asset,
+    required this.uri,
     required this.position,
     required this.size,
   });
 
-  /// Asset path to the WebP animation file.
+  /// URI of the WebP animation file.
   ///
-  /// Should be a valid asset path that can be loaded via `rootBundle.load()`.
-  final String asset;
+  /// - Use `Uri.parse('https://...')` for network sources
+  /// - Use `Uri(path: 'assets/...')` or `Uri.parse('asset://assets/...')` for assets
+  final Uri uri;
 
   /// Screen position where this animation should be rendered.
   ///
@@ -33,29 +34,29 @@ class WebpAnimationItem {
   final Size size;
 
   @override
-  int get hashCode => Object.hash(asset, position, size);
+  int get hashCode => Object.hash(uri, position, size);
 
   @override
   bool operator ==(final Object other) {
     if (identical(this, other)) return true;
     return other is WebpAnimationItem &&
-        other.asset == asset &&
+        other.uri == uri &&
         other.position == position &&
         other.size == size;
   }
 
   /// Creates a copy of this item with modified properties.
   WebpAnimationItem copyWith({
-    final String? asset,
+    final Uri? uri,
     final Offset? position,
     final Size? size,
   }) => WebpAnimationItem(
-    asset: asset ?? this.asset,
+    uri: uri ?? this.uri,
     position: position ?? this.position,
     size: size ?? this.size,
   );
 
   @override
   String toString() =>
-      'WebpAnimationItem(asset: $asset, position: $position, size: $size)';
+      'WebpAnimationItem(uri: $uri, position: $position, size: $size)';
 }

@@ -3,10 +3,15 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 import 'package:image/image.dart' as img;
 
+import '../models/static_image_sheet.dart';
+import '../models/webp_source.dart';
 import 'animation_frame.dart';
 import 'sprite_sheet.dart';
+import 'webp_cache.dart';
+import 'webp_error.dart';
 
 /// BACKGROUND ISOLATE FUNCTION
 /// This does the heavy CPU lifting: decoding WebP and creating sprite sheet.
@@ -16,11 +21,11 @@ DecodedSpriteSheetData _decodeAndCreateSpriteSheet(final Uint8List webpBytes) {
   final animation = img.decodeWebP(webpBytes);
 
   if (animation == null) {
-    throw Exception('Failed to decode WebP animation');
+    throw const DecodeError('Failed to decode WebP animation');
   }
 
   if (animation.numFrames == 0) {
-    throw Exception('WebP animation contains no frames');
+    throw const ValidationError('WebP animation contains no frames');
   }
 
   // Calculate sprite sheet dimensions
@@ -73,6 +78,30 @@ DecodedSpriteSheetData _decodeAndCreateSpriteSheet(final Uint8List webpBytes) {
   );
 }
 
+/// BACKGROUND ISOLATE FUNCTION
+/// This decodes a static WebP image (single frame or first frame of animation).
+
+DecodedStaticImageData _decodeAndCreateStaticImage(final Uint8List webpBytes) {
+  // Decode the WebP image using the image package
+  final image = img.decodeWebP(webpBytes);
+
+  if (image == null) {
+    throw const DecodeError('Failed to decode WebP image');
+  }
+
+  // Use first frame for static images (works for both animated and static WebP)
+  final frame = image.frames.isNotEmpty ? image.frames[0] : image;
+
+  // Convert to RGBA bytes for Flutter's ui.decodeImageFromPixels
+  final rgbaBytes = frame.getBytes(order: img.ChannelOrder.rgba);
+
+  return DecodedStaticImageData(
+    pixels: rgbaBytes,
+    width: frame.width,
+    height: frame.height,
+  );
+}
+
 /// Internal data structure passed between isolates.
 @immutable
 class DecodedSpriteSheetData {
@@ -94,6 +123,19 @@ class DecodedSpriteSheetData {
   final List<AnimationFrame> frames;
 }
 
+/// Internal data structure for static images passed between isolates.
+@immutable
+class DecodedStaticImageData {
+  const DecodedStaticImageData({
+    required this.pixels,
+    required this.width,
+    required this.height,
+  });
+  final Uint8List pixels;
+  final int width;
+  final int height;
+}
+
 /// {@template webp_decoder}
 /// Handles WebP animation decoding using isolate-based processing.
 ///
@@ -105,8 +147,8 @@ class DecodedSpriteSheetData {
 class WebpDecoder {
   WebpDecoder._();
 
-  /// Cache for decoded sprite sheets by asset path to avoid re-decoding.
-  static final Map<String, Future<SpriteSheet>> _cache = {};
+  /// Unified cache for all WebP content.
+  static final WebpCache _cache = WebpCache.instance;
 
   /// Clears the decode cache for all assets.
   ///
@@ -137,17 +179,42 @@ class WebpDecoder {
     return completer.future;
   }
 
-  /// Decodes a WebP animation from an asset path to a sprite sheet.
+  /// Decodes a WebP animation from any source type.
   ///
   /// Uses isolate-based decoding to prevent UI thread blocking.
   /// Results are cached to avoid re-decoding the same animation.
   ///
-  /// @ai Use this method to load WebP animations efficiently.
-  static Future<SpriteSheet> decodeFromAsset(final String assetPath) =>
-      _cache.putIfAbsent(assetPath, () => _decodeFromAsset(assetPath));
+  /// @ai Use this method to load WebP animations from any supported source.
+  static Future<SpriteSheet> decodeAnimation(final WebpSource source) =>
+      switch (source) {
+        AssetSource(path: final path) => _decodeFromAsset(path),
+        NetworkSource(url: final url) => _decodeFromUrl(url),
+      };
 
-  /// Internal method to decode a WebP animation from an asset.
-  static Future<SpriteSheet> _decodeFromAsset(final String assetPath) async {
+  /// Decodes a static WebP image from any source type.
+  ///
+  /// Uses isolate-based decoding to prevent UI thread blocking.
+  /// Results are cached to avoid re-decoding the same image.
+  ///
+  /// @ai Use this method to load static WebP images from any supported source.
+  static Future<StaticImageSheet> decodeStatic(final WebpSource source) =>
+      switch (source) {
+        AssetSource(path: final path) => _decodeStaticFromAsset(path),
+        NetworkSource(url: final url) => _decodeStaticFromUrl(url),
+      };
+
+  /// Internal method to decode a WebP animation from an asset path.
+  static Future<SpriteSheet> _decodeFromAsset(final String assetPath) =>
+      _cache.putIfAbsent(
+        AssetSource(assetPath),
+        'animation',
+        () => _decodeFromAssetImpl(assetPath),
+      );
+
+  /// Implementation method to decode a WebP animation from an asset.
+  static Future<SpriteSheet> _decodeFromAssetImpl(
+    final String assetPath,
+  ) async {
     // Load raw bytes from assets on main isolate
     final byteData = await rootBundle.load(assetPath);
     final buffer = byteData.buffer.asUint8List();
@@ -164,6 +231,102 @@ class WebpDecoder {
       frameHeight: decodedData.frameHeight,
       frameCount: decodedData.frameCount,
       frames: decodedData.frames,
+    );
+  }
+
+  /// Internal method to decode a WebP animation from a network URL.
+  static Future<SpriteSheet> _decodeFromUrl(final String url) =>
+      _cache.putIfAbsent(
+        NetworkSource(url),
+        'animation',
+        () => _decodeFromUrlImpl(url),
+      );
+
+  /// Implementation method to decode a WebP animation from a network URL.
+  static Future<SpriteSheet> _decodeFromUrlImpl(final String url) async {
+    // Load raw bytes from network on main isolate
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode != 200) {
+      throw NetworkError(
+        'Failed to load WebP from network',
+        response.statusCode,
+      );
+    }
+    final buffer = response.bodyBytes;
+
+    // Decode in background isolate
+    final decodedData = await compute(_decodeAndCreateSpriteSheet, buffer);
+
+    // Convert to SpriteSheet model
+    return SpriteSheet(
+      pixels: decodedData.pixels,
+      width: decodedData.width,
+      height: decodedData.height,
+      frameWidth: decodedData.frameWidth,
+      frameHeight: decodedData.frameHeight,
+      frameCount: decodedData.frameCount,
+      frames: decodedData.frames,
+    );
+  }
+
+  /// Internal method to decode a static WebP image from an asset path.
+  static Future<StaticImageSheet> _decodeStaticFromAsset(
+    final String assetPath,
+  ) => _cache.putIfAbsent(
+    AssetSource(assetPath),
+    'static',
+    () => _decodeStaticFromAssetImpl(assetPath),
+  );
+
+  /// Implementation method to decode a static WebP image from an asset.
+  static Future<StaticImageSheet> _decodeStaticFromAssetImpl(
+    final String assetPath,
+  ) async {
+    // Load raw bytes from assets on main isolate
+    final byteData = await rootBundle.load(assetPath);
+    final buffer = byteData.buffer.asUint8List();
+
+    // Decode in background isolate
+    final decodedData = await compute(_decodeAndCreateStaticImage, buffer);
+
+    // Convert to StaticImageSheet model
+    return StaticImageSheet(
+      pixels: decodedData.pixels,
+      width: decodedData.width,
+      height: decodedData.height,
+    );
+  }
+
+  /// Internal method to decode a static WebP image from a network URL.
+  static Future<StaticImageSheet> _decodeStaticFromUrl(final String url) =>
+      _cache.putIfAbsent(
+        NetworkSource(url),
+        'static',
+        () => _decodeStaticFromUrlImpl(url),
+      );
+
+  /// Implementation method to decode a static WebP image from a network URL.
+  static Future<StaticImageSheet> _decodeStaticFromUrlImpl(
+    final String url,
+  ) async {
+    // Load raw bytes from network on main isolate
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode != 200) {
+      throw NetworkError(
+        'Failed to load WebP from network',
+        response.statusCode,
+      );
+    }
+    final buffer = response.bodyBytes;
+
+    // Decode in background isolate
+    final decodedData = await compute(_decodeAndCreateStaticImage, buffer);
+
+    // Convert to StaticImageSheet model
+    return StaticImageSheet(
+      pixels: decodedData.pixels,
+      width: decodedData.width,
+      height: decodedData.height,
     );
   }
 }

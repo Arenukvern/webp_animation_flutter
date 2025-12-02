@@ -8,6 +8,7 @@ import '../core/game_loop_controller.dart';
 import '../core/sprite_sheet.dart';
 import '../core/webp_decoder.dart';
 import '../models/webp_animation_item.dart';
+import '../models/webp_source.dart';
 import '../painters/animation_painter.dart';
 import 'webp_animation_layer_controller.dart';
 
@@ -191,9 +192,10 @@ class _WebpAnimationLayerState extends State<WebpAnimationLayer>
     _animationStates = List.filled(count, null);
 
     // Load all animations in parallel
-    _spriteSheetFutures = widget.animations
-        .map((final item) => WebpDecoder.decodeFromAsset(item.asset))
-        .toList();
+    _spriteSheetFutures = widget.animations.map((final item) {
+      final source = WebpSource.fromUri(item.uri);
+      return WebpDecoder.decodeAnimation(source);
+    }).toList();
 
     // Load animations
     unawaited(_loadAnimations());

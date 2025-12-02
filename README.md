@@ -4,6 +4,19 @@ High-performance Flutter library for animated WebP, using a game loop architectu
 
 Please notice: this package status is a `proof of concept`. Feel free to clone, contribute, and improve it if you will have use for it:)
 
+## Features
+
+- 🎬 **Animated WebP Support**: Smooth playback of animated WebP files
+- 🖼️ **Static WebP Support**: Optimized rendering for single-frame WebP images
+- 🌐 **Network Loading**: Load animations and images from URLs
+- 📦 **Asset Loading**: Load from Flutter assets
+- ⚡ **Isolate-based Decoding**: WebP decoding happens in background threads
+- 🎮 **Game Loop Architecture**: Perfect synchronization for multiple animations
+- 🚀 **Batch Rendering**: Multiple animations in a single GPU draw call
+- 💾 **Intelligent Caching**: Automatic caching prevents re-decoding
+- 🎯 **Flexible Timing**: Respect WebP frame delays or use custom FPS
+- 🎨 **Custom Controls**: Play, pause, seek, and loop control
+
 ## Credits
 
 The animated WebP demo asset from Mathias Bynens for example purposes only: [https://mathiasbynens.be/demo/animated-webp](https://mathiasbynens.be/demo/animated-webp)
@@ -35,13 +48,23 @@ dependencies:
 
 ## Usage Examples
 
-### Simple: Single Animation (auto-play)
+### Simple: Single Animation from Asset (auto-play)
 
 ```dart
 import 'package:webp_animation_flutter/webp_animation_flutter.dart';
 
 WebpAnimation(
-  asset: 'assets/animations/character.webp',
+  uri: Uri(path: 'assets/animations/character.webp'),
+  width: 100,
+  height: 100,
+)
+```
+
+### Simple: Single Animation from Network
+
+```dart
+WebpAnimation(
+  uri: Uri.parse('https://example.com/animations/character.webp'),
   width: 100,
   height: 100,
 )
@@ -51,7 +74,7 @@ WebpAnimation(
 
 ```dart
 WebpAnimation(
-  asset: 'assets/effects/explosion.webp',
+  uri: Uri(path: 'assets/effects/explosion.webp'),
   width: 200,
   height: 150,
   respectFrameDelays: false, // Use custom FPS
@@ -60,11 +83,21 @@ WebpAnimation(
 )
 ```
 
+### Simple: Static WebP Image
+
+```dart
+WebpStaticImage(
+  uri: Uri(path: 'assets/images/logo.webp'),
+  width: 200,
+  height: 200,
+)
+```
+
 ### Simple: Error & Loading States
 
 ```dart
 WebpAnimation(
-  asset: 'assets/loading.webp',
+  uri: Uri(path: 'assets/loading.webp'),
   width: 50,
   height: 50,
   builder: (context, sheet, error) {
@@ -81,17 +114,17 @@ WebpAnimation(
 WebpAnimationLayer(
   animations: [
     WebpAnimationItem(
-      asset: 'assets/char_idle.webp',
+      uri: Uri(path: 'assets/char_idle.webp'),
       position: Offset(10, 20),
       size: Size(100, 100),
     ),
     WebpAnimationItem(
-      asset: 'assets/char_walk.webp',
+      uri: Uri(path: 'assets/char_walk.webp'),
       position: Offset(150, 50),
       size: Size(80, 80),
     ),
     WebpAnimationItem(
-      asset: 'assets/effects/particles.webp',
+      uri: Uri(path: 'assets/effects/particles.webp'),
       position: Offset(200, 100),
       size: Size(60, 60),
     ),
@@ -154,7 +187,7 @@ class _GameScreenState extends State<GameScreen>
         WebpAnimationLayer(
           animations: [
             WebpAnimationItem(
-              asset: 'assets/game/character.webp',
+              uri: Uri(path: 'assets/game/character.webp'),
               position: Offset.zero,
               size: Size(100, 100),
             ),
@@ -183,23 +216,56 @@ Use `WebpAnimationLayer` for perfect sync and unified control.
 **Can I use my own AnimationController?**  
 Yes, pass it to a `WebpAnimation` for advanced timing.
 
+**Can I load animations from the network?**  
+Yes! Use `Uri.parse()` for network URLs:
+
+```dart
+WebpAnimation(
+  uri: Uri.parse('https://example.com/animation.webp'),
+  width: 100,
+  height: 100,
+)
+```
+
+**What's the difference between WebpAnimation and WebpStaticImage?**
+
+- `WebpAnimation`: For animated WebP files with multiple frames
+- `WebpStaticImage`: For static WebP images (single frame), optimized without animation overhead
+
 **How do I migrate from older versions?**  
-Remove the `controllers:` parameter from `WebpAnimationLayer`—timing is now unified internally.
+The `source: WebpSource` parameter has been replaced with `uri: Uri`. Use standard Dart `Uri` instead:
+
+```dart
+// Old
+WebpAnimation(source: AssetSource('path.webp'), ...)
+WebpAnimation(source: NetworkSource('https://...'), ...)
+
+// New
+WebpAnimation(uri: Uri(path: 'path.webp'), ...)
+WebpAnimation(uri: Uri.parse('https://...'), ...)
+```
 
 **What's performance like?**
 
 - WebP decoding in separate thread (isolate)
 - Batches all rendering into a single GPU call
 - Zero timing drift, minimal CPU use even with many animations
+- Intelligent caching prevents re-decoding the same source
 
 ---
 
 ## API References (short)
 
-- **WebpAnimation:** Single animation (see above)
+- **WebpAnimation:** Single animation widget (uses `uri: Uri` parameter)
+- **WebpStaticImage:** Static WebP image widget (optimized for single-frame images, uses `uri: Uri`)
 - **WebpAnimationLayer:** Multi-animation, synched and batch-rendered
 - **WebpAnimationLayerController:** Controls a layer (play/pause/seek/reset)
-- **WebpAnimationItem:** Position/size/configuration for each animation in a layer
+- **WebpAnimationItem:** Position/size/configuration for each animation in a layer (uses `uri: Uri`)
+
+**URI Format:**
+
+- Assets: `Uri(path: 'assets/...')` or `Uri.parse('asset://assets/...')`
+- Network: `Uri.parse('https://...')` or `Uri.parse('http://...')`
 
 ---
 

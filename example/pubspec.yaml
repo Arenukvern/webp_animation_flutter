@@ -10,6 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  http: ^1.6.0
   webp_animation_flutter:
     path: ../
 

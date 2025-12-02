@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../core/animation_state.dart';
 import '../core/sprite_sheet.dart';
+import '../models/static_image_sheet.dart';
 import '../models/webp_animation_item.dart';
 
 /// {@template animation_painter}
@@ -21,6 +22,7 @@ class AnimationPainter extends CustomPainter {
     required this.images,
     required this.animationStates,
     this.animationItems,
+    this.staticImageSheets,
     this.fit = BoxFit.contain,
     super.repaint,
     this.alignment = Alignment.center,
@@ -36,6 +38,10 @@ class AnimationPainter extends CustomPainter {
        assert(
          animationItems == null || animationItems.length == spriteSheets.length,
          'animationItems length must match spriteSheets when provided',
+       ),
+       assert(
+         staticImageSheets == null || staticImageSheets.length == images.length,
+         'staticImageSheets length must match images when provided',
        );
 
   /// Sprite sheets for all animations to render.
@@ -51,6 +57,10 @@ class AnimationPainter extends CustomPainter {
   /// If null, renders as single animation filling the canvas.
   final List<WebpAnimationItem>? animationItems;
 
+  /// Static image sheets for rendering static images.
+  /// If provided, takes precedence over animation rendering.
+  final List<StaticImageSheet?>? staticImageSheets;
+
   /// How to fit animations within their bounds.
   final BoxFit fit;
 
@@ -62,20 +72,33 @@ class AnimationPainter extends CustomPainter {
 
   @override
   void paint(final Canvas canvas, final Size size) {
-    if (spriteSheets.isEmpty || images.isEmpty || animationStates.isEmpty) {
+    if (images.isEmpty) {
       return;
     }
+
+    // Check if we have static images to render
+    final hasStaticImages = staticImageSheets != null &&
+        staticImageSheets!.isNotEmpty &&
+        staticImageSheets![0] != null;
 
     final paint = Paint()
       ..filterQuality = filterQuality
       ..isAntiAlias = true;
 
     if (animationItems == null) {
-      // Single animation mode - fill the entire canvas
-      _paintSingleAnimation(canvas, size, paint);
+      // Single mode - fill the entire canvas
+      if (hasStaticImages) {
+        _paintSingleStaticImage(canvas, size, paint);
+      } else {
+        _paintSingleAnimation(canvas, size, paint);
+      }
     } else {
-      // Batch animation mode - render multiple animations
-      _paintBatchAnimations(canvas, size, paint);
+      // Batch mode - render multiple items
+      if (hasStaticImages) {
+        _paintBatchStaticImages(canvas, size, paint);
+      } else {
+        _paintBatchAnimations(canvas, size, paint);
+      }
     }
   }
 
@@ -87,6 +110,7 @@ class AnimationPainter extends CustomPainter {
       'AnimationPainter('
       'count: ${spriteSheets.length}, '
       'batchMode: ${animationItems != null}, '
+      'staticMode: ${staticImageSheets != null}, '
       'fit: $fit, '
       'alignment: $alignment)';
 
@@ -236,5 +260,54 @@ class AnimationPainter extends CustomPainter {
     final dstRect = _calculateDestinationRect(size, srcRect.size, size);
 
     canvas.drawImageRect(image, srcRect, dstRect, paint);
+  }
+
+  /// Paints a single static image filling the canvas.
+  void _paintSingleStaticImage(
+    final Canvas canvas,
+    final Size size,
+    final Paint paint,
+  ) {
+    final staticImageSheet = staticImageSheets?[0];
+    final image = images[0];
+
+    if (staticImageSheet == null || image == null) {
+      return;
+    }
+
+    final srcRect = staticImageSheet.imageRect;
+    final dstRect = _calculateDestinationRect(size, srcRect.size, size);
+
+    canvas.drawImageRect(image, srcRect, dstRect, paint);
+  }
+
+  /// Paints multiple static images in batch mode.
+  void _paintBatchStaticImages(
+    final Canvas canvas,
+    final Size size,
+    final Paint paint,
+  ) {
+    final items = animationItems;
+    if (items == null || staticImageSheets == null) return;
+
+    for (int i = 0; i < items.length; i++) {
+      final staticImageSheet = staticImageSheets![i];
+      final image = images[i];
+      final item = items[i];
+
+      if (staticImageSheet == null || image == null) {
+        continue;
+      }
+
+      final srcRect = staticImageSheet.imageRect;
+      final dstRect = Rect.fromLTWH(
+        item.position.dx,
+        item.position.dy,
+        item.size.width,
+        item.size.height,
+      );
+
+      canvas.drawImageRect(image, srcRect, dstRect, paint);
+    }
   }
 }

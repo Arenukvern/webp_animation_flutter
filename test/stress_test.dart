@@ -22,7 +22,7 @@ void main() {
       final animations = _createAnimationGrid(
         count: animationCount,
         builder: (final index) => WebpAnimation(
-          asset: animationAsset,
+          uri: Uri(path: animationAsset),
           width: animationSize.width,
           height: animationSize.height,
         ),
@@ -61,7 +61,7 @@ void main() {
       final animationItems = List.generate(
         animationCount,
         (final index) => WebpAnimationItem(
-          asset: animationAsset,
+          uri: Uri(path: animationAsset),
           position: Offset(
             (index % gridSize) * animationSize.width,
             (index ~/ gridSize) * animationSize.height,
@@ -104,7 +104,7 @@ void main() {
       // Test that invalid parameters throw assertions
       expect(
         () => WebpAnimation(
-          asset: animationAsset,
+          uri: Uri(path: animationAsset),
           width: -1, // Invalid negative width
           height: animationSize.height,
         ),
@@ -114,7 +114,7 @@ void main() {
 
       expect(
         () => WebpAnimation(
-          asset: animationAsset,
+          uri: Uri(path: animationAsset),
           width: animationSize.width,
           height: 0, // Invalid zero height
         ),
@@ -124,7 +124,7 @@ void main() {
 
       expect(
         () => WebpAnimation(
-          asset: animationAsset,
+          uri: Uri(path: animationAsset),
           width: animationSize.width,
           height: animationSize.height,
           speed: -1, // Invalid negative speed
@@ -149,8 +149,8 @@ void main() {
       // Test with valid animations
       final animationItems = List.generate(
         animationCount,
-        (final index) => const WebpAnimationItem(
-          asset: animationAsset,
+        (final index) => WebpAnimationItem(
+          uri: Uri(path: animationAsset),
           position: Offset.zero,
           size: animationSize,
         ),

@@ -1,6 +1,6 @@
 name: webp_animation_flutter
 description: High-performance WebP animation library for Flutter using game dev principles. Features isolate-based decoding and efficient sprite sheet rendering.
-version: 0.1.0-dev.3
+version: 0.1.0-dev.4
 homepage: https://github.com/arenukvern/webp_animation_flutter
 repository: https://github.com/arenukvern/webp_animation_flutter
 issue_tracker: https://github.com/arenukvern/webp_animation_flutter/issues
@@ -12,7 +12,6 @@ topics:
   - webp
   - flutter
 
-
 environment:
   sdk: ">=3.10.0 <4.0.0"
   flutter: ">=3.38.0"
@@ -20,6 +19,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  http: ^1.2.1
   image: ^4.5.4
 
 dev_dependencies:

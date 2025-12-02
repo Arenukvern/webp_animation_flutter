@@ -56,6 +56,7 @@ class _HomePageState extends State<HomePage> {
           _buildSingleAnimationView(),
           // Batch animation view
           _buildBatchAnimationView(),
+          _buildStaticImageView(),
         ],
       ),
     ),
@@ -67,10 +68,12 @@ class _HomePageState extends State<HomePage> {
           icon: Icon(Icons.looks_one),
           label: 'Single Animation',
         ),
+
         BottomNavigationBarItem(
           icon: Icon(Icons.grid_view),
           label: 'Batch ($animationCount Animations)',
         ),
+        BottomNavigationBarItem(icon: Icon(Icons.image), label: 'Static Image'),
       ],
     ),
   );
@@ -113,12 +116,12 @@ class _HomePageState extends State<HomePage> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Text(
-          'Single Animation',
+          'Single Animation (Asset)',
           style: Theme.of(context).textTheme.headlineSmall,
         ),
         const SizedBox(height: 20),
         WebpAnimation(
-          asset: animationAsset,
+          uri: Uri(path: animationAsset),
           width: singleAnimationSize.width,
           height: singleAnimationSize.height,
         ),
@@ -127,6 +130,36 @@ class _HomePageState extends State<HomePage> {
           'Individual WebpAnimation widget\nSeparate draw call per animation',
           style: Theme.of(context).textTheme.bodyMedium,
           textAlign: TextAlign.center,
+        ),
+        Text(
+          'Single Animation (Network)',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
+        const SizedBox(height: 20),
+        WebpAnimation(
+          uri: Uri.parse(
+            'https://mathiasbynens.be/demo/animated-webp-supported.webp',
+          ),
+          width: singleAnimationSize.width,
+          height: singleAnimationSize.height,
+        ),
+      ],
+    ),
+  );
+
+  Widget _buildStaticImageView() => Center(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          'Static Image (Asset)',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
+        const SizedBox(height: 20),
+        WebpStaticImage(
+          uri: Uri(path: animationAsset),
+          width: singleAnimationSize.width,
+          height: singleAnimationSize.height,
         ),
       ],
     ),
@@ -139,7 +172,7 @@ class _HomePageState extends State<HomePage> {
       final col = i % _gridSize;
       animationItems.add(
         WebpAnimationItem(
-          asset: animationAsset,
+          uri: Uri(path: animationAsset),
           position: Offset(
             col * batchAnimationSize.width,
             row * batchAnimationSize.height,
