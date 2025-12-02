@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.1.0-dev.4] - 2025-12-02
+
+- added cache for decoded WebP images & animations
+- BREAKING: now all widgets use `Uri` instead of `path` parameter
+
 ## [0.1.0-dev.3] - 2025-12-01
 
 - fixed links to documentation in README.md
