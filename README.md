@@ -1,5 +1,10 @@
 # webp_animation_flutter
 
+[![pub package](https://img.shields.io/pub/v/webp_animation_flutter.svg?include_prereleases)](https://pub.dev/packages/webp_animation_flutter)
+[![All Contributors](https://img.shields.io/github/all-contributors/Arenukvern/webp_animation_flutter?color=ee8449&style=flat-square)](https://github.com/Arenukvern/webp_animation_flutter#contributors-)
+[![maintained with Skill Steward](https://raw.githubusercontent.com/Arenukvern/skill_steward/main/docs/brand/assets/svg/badge-light.svg)](https://github.com/Arenukvern/skill_steward)
+
+
 High-performance Flutter library for animated WebP, using a game loop architecture for perfect sync and ultra-efficient rendering.
 
 Please notice: this package status is a `proof of concept`. Feel free to clone, contribute, and improve it if you will have use for it:)
@@ -273,6 +278,31 @@ WebpAnimation(uri: Uri.parse('https://...'), ...)
 
 - Flutter >=3.3.0
 - Dart >=3.8.1
+
+
+## ✨ Contributors
+
+Huge thanks to everyone who has helped improve this package.
+
+This roster is maintained with [all-contributors](https://allcontributors.org/).
+To add someone, update [`.all-contributorsrc`](.all-contributorsrc) and regenerate the README table, or use the all-contributors bot/CLI from a PR.
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://xsoulspace.dev"><img src="https://avatars.githubusercontent.com/u/15068151?v=4?s=100" width="100px;" alt="Anton Malofeev"/><br /><sub><b>Anton Malofeev</b></sub></a><br /><a href="https://github.com/Arenukvern/webp_animation_flutter/commits?author=Arenukvern" title="Code">💻</a> <a href="https://github.com/Arenukvern/webp_animation_flutter/commits?author=Arenukvern" title="Documentation">📖</a> <a href="#maintenance-Arenukvern" title="Maintenance">🚧</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/molihuan"><img src="https://avatars.githubusercontent.com/u/78474077?v=4?s=100" width="100px;" alt="molihuan"/><br /><sub><b>molihuan</b></sub></a><br /><a href="https://github.com/Arenukvern/webp_animation_flutter/commits?author=molihuan" title="Code">💻</a> <a href="https://github.com/Arenukvern/webp_animation_flutter/issues?q=author%3Amolihuan" title="Bug reports">🐛</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
 
 ## License
 
