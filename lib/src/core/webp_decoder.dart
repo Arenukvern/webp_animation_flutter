@@ -34,7 +34,11 @@ DecodedSpriteSheetData _decodeAndCreateSpriteSheet(final Uint8List webpBytes) {
   final totalHeight = animation.height;
 
   // Create blank sprite sheet image
-  final spriteSheet = img.Image(width: totalWidth, height: totalHeight);
+  final spriteSheet = img.Image(
+    width: totalWidth,
+    height: totalHeight,
+    numChannels: 4,
+  );
 
   // Build frame metadata
   final frames = <AnimationFrame>[];

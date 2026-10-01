@@ -30,6 +30,8 @@ class WebpAnimationExampleApp extends StatelessWidget {
 
 class _HomePageState extends State<HomePage> {
   static const animationAsset = 'assets/animated-webp-supported.webp';
+  static const transparentBackgroundAnimationAsset =
+      'assets/test_transparent_background.webp';
   static const animationCount = 120;
   static const singleAnimationSize = Size(200, 200);
   static const batchAnimationSize = Size(50, 50);
@@ -122,6 +124,17 @@ class _HomePageState extends State<HomePage> {
         const SizedBox(height: 20),
         WebpAnimation(
           uri: Uri(path: animationAsset),
+          width: singleAnimationSize.width,
+          height: singleAnimationSize.height,
+        ),
+        const SizedBox(height: 20),
+        Text(
+          'Single Transparent Background Animation (Asset)',
+          style: Theme.of(context).textTheme.headlineSmall,
+        ),
+        const SizedBox(height: 20),
+        WebpAnimation(
+          uri: Uri(path: transparentBackgroundAnimationAsset),
           width: singleAnimationSize.width,
           height: singleAnimationSize.height,
         ),
